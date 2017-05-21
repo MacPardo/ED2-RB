@@ -61,7 +61,7 @@ void decrementaNivel(TpNodo *nodo) {
 
 TpNodo *leftLeft(TpNodo *nodo) {
     TpNodo *a, *b;
-    
+
     a = nodo;
     b = nodo->esq;
 
@@ -109,10 +109,18 @@ TpNodo *tio(TpNodo *nodo) { //retorna o tio do nodo
     return nodo->pai->pai->esq;
 }
 
+void troca_cor(TpNodo *nodo){
+    if(nodo->cor == BLACK){
+        nodo->cor = RED;
+    } else{
+        nodo->cor = BLACK;
+    }
+}
+
 TpNodo *consertarRB(TpNodo *nodo, TpNodo *sentinela) {
 
     TpNodo *tio;
-    
+
     if (nodo->pai == NULL) { //se o nodo é a raiz
         nodo->cor = BLACK;
         return nodo;
@@ -123,12 +131,32 @@ TpNodo *consertarRB(TpNodo *nodo, TpNodo *sentinela) {
             tio(nodo)->cor = nodo->pai->cor = BLACK;
             nodo->pai->pai->cor = RED;
             return consertarRB(nodo->pai->pai);
-        }
-        else { //se o tio é preto
-            //left left case
-            //left right case
-            //right right case
-            //right left case
+        } else if(nodo->chave < nodo->pai->pai->chave){ //se a inseriu na esquerda do avô
+            if(nodo->chave > nodo->pai->chave){ //caso 2 e caso 3
+                rightRight(nodo->pai);
+                troca_cor(nodo);
+                troca_cor(nodo->pai);
+                leftLeft(nodo->pai);
+                return nodo;
+            } else{ //caso 3
+                troca_cor(nodo->pai);
+                troca_cor(nodo->pai->pai);
+                leftLeft(nodo->pai->pai);
+                return nodo->pai;
+            }
+        } else{ //se inseriu na direita do avô
+            if(nodo->chave > nodo->pai->chave){ //caso 2 e caso 3
+                leftLeft(nodo->pai);
+                troca_cor(nodo);
+                troca_cor(nodo->pai);
+                rightRight(nodo->pai);
+                return nodo;
+            } else{ //caso 3
+                troca_cor(nodo->pai);
+                troca_cor(nodo->pai->pai);
+                rightRight(nodo->pai->pai);
+                return nodo->pai;
+            }
         }
     }
 
@@ -162,7 +190,7 @@ TpNodo *_insere(TpNodo *pai, TpNodo *nodo, TpNodo *sentinela) {
     }
 
     pai = consertarRB(pai, sentinela);
-    
+
     return pai;
 }
 
