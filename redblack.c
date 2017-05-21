@@ -39,11 +39,60 @@ TpArvore *inicializa(void) { // aloca memoria para inicializar a arvore
     return arvore;
 }
 
+
+void incrementaNivel(TpNodo *nodo) {
+    // incrementa o nivel do nodo e seus descendentes
+    if (nodo == NULL)
+        return;
+    nodo->nivel++;
+    incrementaNivel(nodo->dir);
+    incrementaNivel(nodo->esq);
+}
+
+void decrementaNivel(TpNodo *nodo) {
+    // decrementa o nivel do nodo e seus descendentes
+    if (nodo == NULL)
+        return;
+    nodo->nivel--;
+    decrementaNivel(nodo->dir);
+    decrementaNivel(nodo->esq);
+}
+
+
 TpNodo *leftLeft(TpNodo *nodo) {
     TpNodo *a, *b;
     
     a = nodo;
     b = nodo->esq;
+
+    b->pai = a->pai;
+    a->esq = b->dir;
+    if (a->esq != NULL)
+        a->esq->pai = a;
+    a->pai = b;
+    b->dir = a;
+
+    nodo = b;
+
+    return nodo;
+}
+
+TpNodo *rightRight(TpNodo * nodo) {
+    TpNodo *a, *b;
+
+    a = nodo;
+    b = nodo->dir;
+
+    b->pai = a->pai;
+    a->esq = b->dir;
+    if (a->esq != NULL)
+        a->esq->pai = a;
+    a->pai = b;
+    b->dir = a;
+
+    nodo = b;
+
+    return nodo;
 }
 
 TpNodo *tio(TpNodo *nodo) { //retorna o tio do nodo
