@@ -30,7 +30,6 @@ TpArvore *inicializa(void) { // aloca memoria para inicializar a arvore
     TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
     TpNodo *sentinela = (TpNodo *)malloc(sizeof(TpNodo));
     arvore->raiz = NULL;
-    arvore->nivelMax = 0;
     arvore->sentinela = sentinela;
     arvore->sentinela->chave = -1;
     arvore->sentinela->cor = BLACK;
@@ -38,6 +37,13 @@ TpArvore *inicializa(void) { // aloca memoria para inicializar a arvore
     arvore->sentinela->esq = NULL;
     arvore->sentinela->dir = NULL;
     return arvore;
+}
+
+TpNodo *leftLeft(TpNodo *nodo) {
+    TpNodo *a, *b;
+    
+    a = nodo;
+    b = nodo->esq;
 }
 
 TpNodo *tio(TpNodo *nodo) { //retorna o tio do nodo
@@ -93,10 +99,10 @@ TpNodo *_insere(TpNodo *pai, TpNodo *nodo, TpNodo *sentinela) {
         return pai;
     }
 
-    if (pai->dir == NULL && nodo->chave > pai->chave) {
+    if (pai->dir == sentinela && nodo->chave > pai->chave) {
         pai->dir = nodo;
     }
-    else if (pai->esq == NULL && nodo->chave < pai->chave) {
+    else if (pai->esq == sentinela && nodo->chave < pai->chave) {
         pai->esq = nodo;
     }
     else if (nodo->chave > pai->chave) {
@@ -118,5 +124,14 @@ TpArvore *insere(TpArvore *arvore, int chave){
     nodo->pai = NULL;
     nodo->nivel = 0;
     nodo->chave = chave;
-    return _insere(arvore->raiz, nodo, arvore->sentinela);
+    arvore->raiz = _insere(arvore->raiz, nodo, arvore->sentinela);
+    return arvore;
+}
+
+void _imprime(TpNodo * nodo) {
+    if(nodo == NULL) return;
+    _imprime(nodo->dir, aux + 1);
+    for(int i = 0; i < nodo->nivel; i++) printf("  ");
+    printf("%d\n", nodo->val);
+    _imprime(nodo->esq, aux + 1);
 }
