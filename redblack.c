@@ -19,7 +19,7 @@ typedef struct _arvore {
 } TpArvore;
 
 TpArvore *inicializa(void);
-TpArvore *insere(TpArvore *arvore);
+TpArvore *insere(TpArvore *arvore, int chave);
 
 int main(void) {
     TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
@@ -132,8 +132,6 @@ void troca_cor(TpNodo *nodo){
 
 TpNodo *consertarRB(TpNodo *nodo, TpNodo *sentinela) {
 
-    TpNodo *tio;
-
     if (nodo->pai == NULL) { //se o nodo é a raiz
         nodo->cor = BLACK;
         return nodo;
@@ -143,7 +141,7 @@ TpNodo *consertarRB(TpNodo *nodo, TpNodo *sentinela) {
         if (tio(nodo)->cor == RED) { //se o tio é vermelho
             tio(nodo)->cor = nodo->pai->cor = BLACK;
             nodo->pai->pai->cor = RED;
-            return consertarRB(nodo->pai->pai);
+            return consertarRB(nodo->pai->pai, sentinela);
         } else if(nodo->chave < nodo->pai->pai->chave){ //se a inseriu na esquerda do avô
             if(nodo->chave > nodo->pai->chave){ //caso 2 e caso 3
                 rightRight(nodo->pai);
@@ -220,8 +218,8 @@ TpArvore *insere(TpArvore *arvore, int chave){
 
 void _imprime(TpNodo * nodo) {
     if(nodo == NULL) return;
-    _imprime(nodo->dir, aux + 1);
+    _imprime(nodo->dir);
     for(int i = 0; i < nodo->nivel; i++) printf("  ");
-    printf("%d\n", nodo->val);
-    _imprime(nodo->esq, aux + 1);
+    printf("%d\n", nodo->chave);
+    _imprime(nodo->esq);
 }
