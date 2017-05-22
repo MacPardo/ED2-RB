@@ -36,6 +36,7 @@ TpArvore *inicializa(void) { // aloca memoria para inicializar a arvore
     arvore->sentinela->pai = NULL;
     arvore->sentinela->esq = NULL;
     arvore->sentinela->dir = NULL;
+    arvore->sentinela->nivel = -1;
     return arvore;
 }
 
@@ -71,6 +72,7 @@ TpNodo *leftLeft(TpNodo *nodo) {
         a->esq->pai = a;
     a->pai = b;
     b->dir = a;
+
 
     nodo = b;
 
