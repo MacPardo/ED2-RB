@@ -4,6 +4,8 @@
 #define RED 0
 #define BLACK 1
 
+long long int oh_well = 0;
+
 typedef struct _nodo {
     int chave;
     int nivel;
@@ -21,22 +23,28 @@ typedef struct _arvore {
 TpArvore *inicializa(void);
 TpArvore *insere(TpArvore *arvore, int chave);
 void imprime(TpArvore *arvore);
+void _imprime(TpNodo * nodo, TpNodo *sentinela);
+
+int treeSize(TpNodo * nodo, TpNodo * sentinela){
+    if(nodo == NULL || nodo == sentinela) return 0;
+    return 1 + treeSize(nodo->esq, sentinela) + treeSize(nodo->dir, sentinela);
+}
 
 int main(void) {
     TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
     arvore = inicializa();
 
-    arvore = insere(arvore, 3);
-    arvore = insere(arvore, 8);
-    arvore = insere(arvore, 1);
-    arvore = insere(arvore, 10);
-    arvore = insere(arvore, 100);
-    arvore = insere(arvore, 4);
-    arvore = insere(arvore, 200);
-    arvore = insere(arvore, 300);
-    arvore = insere(arvore, 400);
-    arvore = insere(arvore, 500);
-    arvore = insere(arvore, 600);
+    int n;
+
+    while(scanf("%d", &n) != EOF){
+        arvore = insere(arvore, n);
+        printf("\n");
+        imprime(arvore);
+        printf("size = %d\n", treeSize(arvore->raiz, arvore->sentinela));
+        printf("\n");
+    }
+
+    printf("fim\n");
 
     imprime(arvore);
 }
@@ -61,6 +69,20 @@ void incrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
     if (nodo == NULL || nodo == sentinela)
         return;
     nodo->nivel++;
+
+    _imprime(nodo, sentinela);
+
+    if (nodo->dir == sentinela){
+        printf("oh my god I can't believe this\n");
+    }
+    else if (nodo->dir == NULL) {
+        printf("I'm slightly confused\n");
+    }
+    else {
+        printf("ok now fuck this shit\n");
+        printf("%x %x", nodo, sentinela);
+    }
+
     incrementaNivel(nodo->dir, sentinela);
     incrementaNivel(nodo->esq, sentinela);
 }
@@ -70,7 +92,7 @@ void decrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
     if (nodo == NULL || nodo == sentinela)
         return;
     nodo->nivel--;
-    if (nodo->dir == sentinela) printf("oh my god I can't believe this\n");
+
     decrementaNivel(nodo->dir, sentinela);
     decrementaNivel(nodo->esq, sentinela);
 }
@@ -78,6 +100,10 @@ void decrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
 
 TpNodo *leftLeft(TpNodo *nodo, TpNodo * sentinela) {
     TpNodo *a, *b;
+
+    oh_well++;
+    printf("antes\n");
+    _imprime(nodo, sentinela);
 
     a = nodo;
     b = nodo->esq;
@@ -97,11 +123,19 @@ TpNodo *leftLeft(TpNodo *nodo, TpNodo * sentinela) {
 
     nodo = b;
 
+    printf("depois\n");
+    printf("k = %d\n", oh_well);
+    _imprime(nodo, sentinela);
+
     return nodo;
 }
 
 TpNodo *rightRight(TpNodo * nodo, TpNodo * sentinela) {
     TpNodo *a, *b;
+
+    oh_well++;
+    printf("antes\n");
+    _imprime(nodo, sentinela);
 
     a = nodo;
     b = nodo->dir;
@@ -118,6 +152,10 @@ TpNodo *rightRight(TpNodo * nodo, TpNodo * sentinela) {
 
     decrementaNivel(b->esq, sentinela);
     incrementaNivel(a->dir, sentinela);
+
+    printf("depois\n");
+    printf("k = %d\n", oh_well);
+    _imprime(nodo, sentinela);
 
     nodo = b;
 
@@ -203,6 +241,8 @@ TpNodo *_insere(TpNodo *pai, TpNodo *nodo, TpNodo *sentinela) {
         return pai;
     }
 
+    nodo->nivel = pai->nivel + 1;
+
     if (pai->dir == sentinela && nodo->chave > pai->chave) {
         pai->dir = nodo;
     }
@@ -236,7 +276,7 @@ void _imprime(TpNodo * nodo, TpNodo *sentinela) {
     if(nodo == NULL || nodo == sentinela) return;
     _imprime(nodo->dir, sentinela);
     for(int i = 0; i < nodo->nivel; i++) printf("  ");
-    printf("%d\n", nodo->chave);
+    printf("%d %s\n", nodo->chave, nodo->cor == RED ? "red" : "black");
     _imprime(nodo->esq, sentinela);
 }
 
