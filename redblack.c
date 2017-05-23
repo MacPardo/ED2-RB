@@ -30,37 +30,37 @@ int treeSize(TpNodo * nodo, TpNodo * sentinela){
     return 1 + treeSize(nodo->esq, sentinela) + treeSize(nodo->dir, sentinela);
 }
 
-// int main(void) {
-//     TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
-//     arvore = inicializa();
-//
-//     int n;
-//
-//     while(scanf("%d", &n) != EOF){
-//         arvore = insere(arvore, n);
-//         printf("\n");
-//         imprime(arvore);
-//         printf("size = %d\n", treeSize(arvore->raiz, arvore->sentinela));
-//         printf("\n");
-//     }
-//
-//     printf("fim\n");
-//
-//     imprime(arvore);
-// }
-int main(){
-    TpArvore *arvore = (TpArvore*)malloc(sizeof(TpArvore));
+int main(void) {
+    TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
     arvore = inicializa();
-    arvore = insere(arvore, 18);
-    arvore = insere(arvore, 15);
-    arvore = insere(arvore, 11);
-    arvore = insere(arvore, 6);
-    arvore = insere(arvore, 9);
-    arvore = insere(arvore, 3);
-    arvore = insere(arvore, 14);
-    arvore = insere(arvore, 13);
+
+    int n;
+
+    while(scanf("%d", &n) != EOF){
+        arvore = insere(arvore, n);
+        printf("\n");
+        imprime(arvore);
+        printf("size = %d\n", treeSize(arvore->raiz, arvore->sentinela));
+        printf("\n");
+    }
+
+    printf("fim\n");
+
     imprime(arvore);
 }
+//int main(){
+//    TpArvore *arvore = (TpArvore*)malloc(sizeof(TpArvore));
+//    arvore = inicializa();
+//    arvore = insere(arvore, 18);
+//    arvore = insere(arvore, 15);
+//    arvore = insere(arvore, 11);
+//    arvore = insere(arvore, 6);
+//    arvore = insere(arvore, 9);
+//    arvore = insere(arvore, 3);
+//    arvore = insere(arvore, 14);
+//    arvore = insere(arvore, 13);
+//    imprime(arvore);
+//}
 
 TpArvore *inicializa(void) { // aloca memoria para inicializar a arvore
     TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
@@ -82,8 +82,6 @@ void incrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
     if (nodo == NULL || nodo == sentinela)
         return;
     nodo->nivel++;
-
-    _imprime(nodo, sentinela);
 
     if (nodo->dir == sentinela){
         printf("oh my god I can't believe this\n");
@@ -112,12 +110,8 @@ void decrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
 }
 
 
-TpNodo *leftLeft(TpNodo *nodo, TpNodo * sentinela) {
+void leftLeft(TpNodo *nodo, TpNodo * sentinela) {
     TpNodo *a, *b;
-
-    oh_well++;
-    printf("antes\n");
-    _imprime(nodo, sentinela);
 
     a = nodo;
     b = nodo->esq;
@@ -134,52 +128,32 @@ TpNodo *leftLeft(TpNodo *nodo, TpNodo * sentinela) {
 
     decrementaNivel(b->esq, sentinela);
     incrementaNivel(a->dir, sentinela);
-
-    nodo = b;
-
-    printf("depois\n");
-    printf("k = %d\n", oh_well);
-    _imprime(nodo, sentinela);
-
-    return nodo;
 }
 
-TpNodo *rightRight(TpNodo * nodo, TpNodo * sentinela) {
+void rightRight(TpNodo * nodo, TpNodo * sentinela) {
     TpNodo *a, *b;
-
-    oh_well++;
-    printf("antes\n");
-    _imprime(nodo, sentinela);
 
     a = nodo;
     b = nodo->dir;
 
     b->pai = a->pai;
-    a->esq = b->dir;
-    if (a->esq != NULL)
-        a->esq->pai = a;
+    a->dir = b->esq;
+    if (a->dir != NULL)
+        a->dir->pai = a;
     a->pai = b;
     b->esq = a;
 
     b->nivel--;
     a->nivel++;
 
-    decrementaNivel(b->esq, sentinela);
-    incrementaNivel(a->dir, sentinela);
-
-    printf("depois\n");
-    printf("k = %d\n", oh_well);
-    _imprime(nodo, sentinela);
-
-    nodo = b;
-
-    return nodo;
+    decrementaNivel(b->dir, sentinela);
+    incrementaNivel(a->esq, sentinela);
 }
 
-TpNodo *tio(TpNodo *nodo) { //retorna o tio do nodo
+TpNodo *tio(TpNodo *nodo, TpNodo * sentinela) { //retorna o tio do nodo
     //se não tem pai ou avô não tem tio
     if (nodo->pai == NULL || nodo->pai->pai == NULL)
-        return NULL;
+        return sentinela;
 
     //se o pai do nodo é o filho da esquerda do avô
     if (nodo->pai == nodo->pai->pai->esq) {
@@ -198,9 +172,22 @@ void troca_cor(TpNodo *nodo){
     }
 }
 
+TpNodo * encontraRaiz(TpNodo * nodo){
+    if(nodo == NULL) {
+        printf("ops\n");
+        return NULL;
+    }
+
+    if(nodo->pai == NULL){
+        return nodo;
+    }
+
+    return encontraRaiz(nodo->pai);
+}
+
 void consertarRB(TpNodo *nodo, TpNodo *sentinela) {
 
-    TpNodo *tiu = tio(nodo);
+    TpNodo *tiu = tio(nodo, sentinela);
 
     if (nodo->pai == NULL) { //se o nodo é a raiz
         nodo->cor = BLACK;
@@ -213,29 +200,41 @@ void consertarRB(TpNodo *nodo, TpNodo *sentinela) {
             troca_cor(nodo->pai);
             troca_cor(nodo->pai->pai);
             consertarRB(nodo->pai->pai, sentinela);
+            printf("caso 1\n");
         } else if(nodo->chave < nodo->pai->pai->chave){ //se a inseriu na esquerda do avô
             if(nodo == nodo->pai->dir){ //caso 2 e caso 3
-                nodo = rightRight(nodo->pai, sentinela);
+                rightRight(nodo->pai, sentinela);
                 consertarRB(nodo->esq, sentinela);
-                // troca_cor(nodo->pai);
-                // troca_cor(nodo->pai->pai);
-                // nodo = leftLeft(nodo->pai->pai, sentinela);
+                printf("caso 2\n");
             } else{ //caso 3
                 troca_cor(nodo->pai);
+                printf("nodo->pai->cor = %s\n", nodo->pai->cor == RED ? "RED" : "BLACK");
                 troca_cor(nodo->pai->pai);
-                nodo = leftLeft(nodo->pai->pai, sentinela);
+                printf("nodo->pai->pai->cor = %s\n", nodo->pai->pai->cor == RED ? "RED" : "BLACK");
+                printf("ARVORE ANTES\n");
+                _imprime(nodo->pai->pai, sentinela);
+                leftLeft(nodo->pai->pai, sentinela);
+                printf("ARVORE DEPOIS\n");
+                printf("irmao = %d\n", nodo->pai->dir->chave);
+                printf("pai = %d\n", nodo->pai->chave);
+                printf("nodo = %d\n", nodo->chave);
+                _imprime(nodo->pai->pai, sentinela);
+                printf("caso 3 de cima\n");
             }
         } else{ //se inseriu na direita do avô
             if(nodo == nodo->pai->dir){ //caso 2 e caso 3
-                nodo = leftLeft(nodo->pai, sentinela);
+                leftLeft(nodo->pai, sentinela);
                 consertarRB(nodo->dir, sentinela);
-                // troca_cor(nodo);
-                // troca_cor(nodo->pai);
-                // rightRight(nodo->pai, sentinela);
+                printf("caso 2\n");
             } else{ //caso 3
                 troca_cor(nodo->pai);
+                printf("nodo->pai->cor = %s\n", nodo->pai->cor == RED ? "RED" : "BLACK");
                 troca_cor(nodo->pai->pai);
-                nodo = rightRight(nodo->pai->pai, sentinela);
+                printf("nodo->pai->pai->cor = %s\n", nodo->pai->pai->cor == RED ? "RED" : "BLACK");
+                rightRight(nodo->pai->pai, sentinela);
+                printf("nodo->cor = %s\n", nodo->cor == RED ? "RED" : "BLACK");
+                printf("nodo->pai->pai->cor = %s\n", nodo->pai->pai->cor == RED ? "RED" : "BLACK");
+                printf("caso 3\n");
             }
         }
     }
@@ -279,7 +278,8 @@ TpArvore *insere(TpArvore *arvore, int chave){
     nodo->nivel = 0;
     nodo->chave = chave;
     arvore->raiz = _insere(arvore->raiz, nodo, arvore->sentinela);
-    consertarRB(nodo, arvore ->sentinela);
+    consertarRB(nodo, arvore->sentinela);
+    arvore->raiz = encontraRaiz(nodo);
     return arvore;
 }
 
