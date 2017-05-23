@@ -77,6 +77,7 @@ void decrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
     if (nodo == NULL || nodo == sentinela)
         return;
     nodo->nivel--;
+
     decrementaNivel(nodo->dir, sentinela);
     decrementaNivel(nodo->esq, sentinela);
 }
@@ -158,6 +159,7 @@ void troca_cor(TpNodo *nodo){
 
 TpNodo * encontraRaiz(TpNodo * nodo){
     if(nodo == NULL) {
+        return NULL;
     }
 
     if(nodo->pai == NULL){
@@ -182,14 +184,14 @@ void consertarRB(TpNodo *nodo, TpNodo *sentinela) {
             troca_cor(nodo->pai);
             troca_cor(nodo->pai->pai);
             consertarRB(nodo->pai->pai, sentinela);
+        } else if(nodo->chave < nodo->pai->pai->chave){ //se a inseriu na esquerda do avô
+            if(nodo == nodo->pai->dir){ //caso 2 e caso 3
                 rightRight(nodo->pai, sentinela);
                 consertarRB(nodo->esq, sentinela);
             } else{ //caso 3
                 troca_cor(nodo->pai);
                 troca_cor(nodo->pai->pai);
-                _imprime(nodo->pai->pai, sentinela);
                 leftLeft(nodo->pai->pai, sentinela);
-                _imprime(nodo->pai->pai, sentinela);
             }
         } else{ //se inseriu na direita do avô
             if(nodo == nodo->pai->esq){ //caso 2 e caso 3
