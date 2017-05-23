@@ -30,22 +30,35 @@ int treeSize(TpNodo * nodo, TpNodo * sentinela){
     return 1 + treeSize(nodo->esq, sentinela) + treeSize(nodo->dir, sentinela);
 }
 
-int main(void) {
-    TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
+// int main(void) {
+//     TpArvore *arvore = (TpArvore *)malloc(sizeof(TpArvore));
+//     arvore = inicializa();
+//
+//     int n;
+//
+//     while(scanf("%d", &n) != EOF){
+//         arvore = insere(arvore, n);
+//         printf("\n");
+//         imprime(arvore);
+//         printf("size = %d\n", treeSize(arvore->raiz, arvore->sentinela));
+//         printf("\n");
+//     }
+//
+//     printf("fim\n");
+//
+//     imprime(arvore);
+// }
+int main(){
+    TpArvore *arvore = (TpArvore*)malloc(sizeof(TpArvore));
     arvore = inicializa();
-
-    int n;
-
-    while(scanf("%d", &n) != EOF){
-        arvore = insere(arvore, n);
-        printf("\n");
-        imprime(arvore);
-        printf("size = %d\n", treeSize(arvore->raiz, arvore->sentinela));
-        printf("\n");
-    }
-
-    printf("fim\n");
-
+    arvore = insere(arvore, 18);
+    arvore = insere(arvore, 15);
+    arvore = insere(arvore, 11);
+    arvore = insere(arvore, 6);
+    arvore = insere(arvore, 9);
+    arvore = insere(arvore, 3);
+    arvore = insere(arvore, 14);
+    arvore = insere(arvore, 13);
     imprime(arvore);
 }
 
@@ -92,7 +105,8 @@ void decrementaNivel(TpNodo *nodo, TpNodo * sentinela) {
     if (nodo == NULL || nodo == sentinela)
         return;
     nodo->nivel--;
-
+    oh_well++;
+    printf("AAAAAAAAAAAAAA%d,   %d\n", oh_well, nodo->chave);
     decrementaNivel(nodo->dir, sentinela);
     decrementaNivel(nodo->esq, sentinela);
 }
@@ -145,7 +159,7 @@ TpNodo *rightRight(TpNodo * nodo, TpNodo * sentinela) {
     if (a->esq != NULL)
         a->esq->pai = a;
     a->pai = b;
-    b->dir = a;
+    b->esq = a;
 
     b->nivel--;
     a->nivel++;
@@ -184,55 +198,53 @@ void troca_cor(TpNodo *nodo){
     }
 }
 
-TpNodo *consertarRB(TpNodo *nodo, TpNodo *sentinela) {
+void consertarRB(TpNodo *nodo, TpNodo *sentinela) {
+
+    TpNodo *tiu = tio(nodo);
 
     if (nodo->pai == NULL) { //se o nodo é a raiz
         nodo->cor = BLACK;
-        return nodo;
+        return;
     }
 
     if (nodo->pai->cor == RED) { //se o pai é vermelho
-        if (tio(nodo)->cor == RED) { //se o tio é vermelho
-            tio(nodo)->cor = nodo->pai->cor = BLACK;
-            nodo->pai->pai->cor = RED;
-            return consertarRB(nodo->pai->pai, sentinela);
+        if (tiu->cor == RED) { //se o tio é vermelho
+            troca_cor(tiu);
+            troca_cor(nodo->pai);
+            troca_cor(nodo->pai->pai);
+            consertarRB(nodo->pai->pai, sentinela);
         } else if(nodo->chave < nodo->pai->pai->chave){ //se a inseriu na esquerda do avô
-            if(nodo->chave > nodo->pai->chave){ //caso 2 e caso 3
-                rightRight(nodo->pai, sentinela);
-                troca_cor(nodo);
-                troca_cor(nodo->pai);
-                leftLeft(nodo->pai, sentinela);
-                return nodo;
+            if(nodo == nodo->pai->dir){ //caso 2 e caso 3
+                nodo = rightRight(nodo->pai, sentinela);
+                consertarRB(nodo->esq, sentinela);
+                // troca_cor(nodo->pai);
+                // troca_cor(nodo->pai->pai);
+                // nodo = leftLeft(nodo->pai->pai, sentinela);
             } else{ //caso 3
                 troca_cor(nodo->pai);
                 troca_cor(nodo->pai->pai);
-                leftLeft(nodo->pai->pai, sentinela);
-                return nodo->pai;
+                nodo = leftLeft(nodo->pai->pai, sentinela);
             }
         } else{ //se inseriu na direita do avô
-            if(nodo->chave > nodo->pai->chave){ //caso 2 e caso 3
-                leftLeft(nodo->pai, sentinela);
-                troca_cor(nodo);
-                troca_cor(nodo->pai);
-                rightRight(nodo->pai, sentinela);
-                return nodo;
+            if(nodo == nodo->pai->dir){ //caso 2 e caso 3
+                nodo = leftLeft(nodo->pai, sentinela);
+                consertarRB(nodo->dir, sentinela);
+                // troca_cor(nodo);
+                // troca_cor(nodo->pai);
+                // rightRight(nodo->pai, sentinela);
             } else{ //caso 3
                 troca_cor(nodo->pai);
                 troca_cor(nodo->pai->pai);
-                rightRight(nodo->pai->pai, sentinela);
-                return nodo->pai;
+                nodo = rightRight(nodo->pai->pai, sentinela);
             }
         }
     }
-
-    return nodo;
 }
 
 TpNodo *_insere(TpNodo *pai, TpNodo *nodo, TpNodo *sentinela) {
     nodo->pai = pai;
 
     if (pai == NULL) {
-        nodo->cor = BLACK;
         return nodo;
     }
 
@@ -250,13 +262,11 @@ TpNodo *_insere(TpNodo *pai, TpNodo *nodo, TpNodo *sentinela) {
         pai->esq = nodo;
     }
     else if (nodo->chave > pai->chave) {
-        pai = _insere(pai->dir, nodo, sentinela);
+        pai->dir = _insere(pai->dir, nodo, sentinela);
     }
     else {
-        pai = _insere(pai->esq, nodo, sentinela);
+        pai->esq = _insere(pai->esq, nodo, sentinela);
     }
-
-    pai = consertarRB(pai, sentinela);
 
     return pai;
 }
@@ -269,6 +279,7 @@ TpArvore *insere(TpArvore *arvore, int chave){
     nodo->nivel = 0;
     nodo->chave = chave;
     arvore->raiz = _insere(arvore->raiz, nodo, arvore->sentinela);
+    consertarRB(nodo, arvore ->sentinela);
     return arvore;
 }
 
